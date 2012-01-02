@@ -18,10 +18,9 @@ repositories {
 
 dependencies {
 	compile "com.google.guava:guava:10.0"
-	compile "log4j:log4j:1.2.16"
+	compile "org.antlr:stringtemplate:4.0.2"
 	compile "net.sf.jopt-simple:jopt-simple:4.3"
-	compile "net.sf.json-lib:json-lib:2.4:jdk15"
-	compile "com.jayway.jsonpath:json-path:0.5.5"
+	compile "com.googlecode.json-simple:json-simple:1.1"
 
 	testCompile "junit:junit:4.8"
 	testCompile "org.hamcrest:hamcrest-all:1.1"
