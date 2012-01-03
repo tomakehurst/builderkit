@@ -1,7 +1,10 @@
 package com.github.tomakehurst.builderkit.json;
 
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
+
+import java.io.File;
 
 import org.junit.Test;
 
@@ -18,10 +21,14 @@ public class JsonBuilderAcceptanceTest {
 			"	\"percentSatisfied\": 76.234				 	\n" +
 			"}";
 		
-		JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ThingBuilder");
-		String builderJava = generator.generate(json);
+		JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ThingBuilder", json);
+
+		generator.writeToFileUnder("src/generated/java");
+		assertTrue(new File("src/generated/java/com/test/something/ThingBuilder.java").exists());
 		
+		String builderJava = generator.generate();
 		System.out.println(builderJava);
+		
 		
 		assertThat(builderJava, containsString("public ThingBuilder withName(String name)"));
 		assertThat(builderJava, containsString("public ThingBuilder withFavouriteColour(String favouriteColour)"));

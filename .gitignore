@@ -43,7 +43,5 @@ bin
 .settings
 .gradle
 
-
-# Misc #
-########
-copy-admin.sh
+src/generated/java
+src/generated/resources
