@@ -27,9 +27,10 @@ public class BuilderTemplateTest {
 		ST template = new ST(templateContent, '$', '$')
 			.add("package", "com.test.something")
 			.add("className", "ThingBuilder")
-			.add("isArray", true)
+			.add("isArray", false)
 			.add("properties", props.entrySet());
 		
 		System.out.println(template.render());
 	}
+	
 }

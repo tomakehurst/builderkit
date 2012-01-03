@@ -27,6 +27,13 @@ dependencies {
 	testCompile "org.jmock:jmock:2.5.1", "org.jmock:jmock-junit4:2.5.1"
 }
 
+sourceSets {
+	generated {
+		java {
+		}
+	}
+}
+
 task "create-dirs" << {
    sourceSets.all*.java.srcDirs*.each { it.mkdirs() }
    sourceSets.all*.resources.srcDirs*.each { it.mkdirs() }

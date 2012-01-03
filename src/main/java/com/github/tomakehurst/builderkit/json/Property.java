@@ -25,6 +25,10 @@ public class Property {
 	public String getName() {
 		return name;
 	}
+	
+	public String getNameFirstLetterUppercase() {
+		return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T getDefaultValue() {

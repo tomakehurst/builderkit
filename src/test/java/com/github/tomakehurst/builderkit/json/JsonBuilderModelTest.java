@@ -61,6 +61,14 @@ public class JsonBuilderModelTest {
 		JsonBuilderModel model = new JsonBuilderModel(json);
 		
 		assertThat(model.getProperties().get(0).getType().getJavaClassNoPackage(), is("Double"));
+	}
+	
+	@Test
+	public void correclyGeneratesUppercaseFirstLetterPropertyName() throws Exception {
+		String json = "{ \"width\": 51.1234 }";
 		
+		JsonBuilderModel model = new JsonBuilderModel(json);
+		
+		assertThat(model.getProperties().get(0).getNameFirstLetterUppercase(), is("Width"));
 	}
 }
