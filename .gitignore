@@ -43,5 +43,4 @@ bin
 .settings
 .gradle
 
-src/generated/java/*/
-src/generated/resources
+src/generated/java/*
