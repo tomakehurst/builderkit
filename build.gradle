@@ -39,6 +39,12 @@ task "create-dirs" << {
    sourceSets.all*.resources.srcDirs*.each { it.mkdirs() }
 }
 
+clean.doLast {
+	println 'deleting generated sources...'
+	sourceSets.generated.java.srcDirs.each { delete it.absolutePath }
+	sourceSets.generated.resources.srcDirs.each { delete it.absolutePath }
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -51,4 +57,3 @@ uploadArchives {
 task release {
 	dependsOn clean, uploadArchives
 }
-
