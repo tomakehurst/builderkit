@@ -1,0 +1,86 @@
+rootClass(package, model) ::= <<
+
+package $package$;
+
+import java.util.Map;
+import org.json.simple.JSONObject;
+
+public class $model.className$ {
+	
+	private Map<String, Object> jsonObject;
+
+	@SuppressWarnings("unchecked")	
+	public $model.className$() {
+		jsonObject = new JSONObject();
+		$defaultValues(model)$
+	}
+	
+	$withMethods(model)$
+	
+	public String asJson() {
+		return jsonObject.toString();
+	}
+	
+	$nestedInnerClasses(model)$
+}
+>>
+
+
+
+innerClass(model) ::= <<
+public static class $model.className$ {
+
+	private Map<String, Object> jsonObject;
+
+	@SuppressWarnings("unchecked")	
+	public $model.className$() {
+		jsonObject = new JSONObject();
+		$defaultValues(model)$
+	}
+
+	$withMethods(model)$
+	
+	public Map<String, Object> asJsonObject() {
+		return jsonObject;
+	}
+
+	$nestedInnerClasses(model)$
+\}
+>>
+
+
+nestedInnerClasses(model) ::= <<
+$if(model.hasObjectProperties)$
+$model.objectProperties:{ objectProp | 
+$innerClass(objectProp.model)$
+}$
+$endif$
+>>
+
+
+
+withMethods(model) ::= <<
+$model.properties:{ property | 
+public $model.className$ with$property.nameFirstLetterUppercase$($property.javaClassName$ $property.name$) {
+	$if(property.object)$
+	jsonObject.put("$property.name$", $property.name$.asJsonObject());
+	$else$
+	jsonObject.put("$property.name$", $property.name$);
+	$endif$
+	return this;
+\}
+
+}$
+>>
+
+
+
+defaultValues(model) ::= <<
+$model.properties:{ property |
+$if(property.object)$
+jsonObject.put("$property.name$", new $property.javaClassName$().asJsonObject());
+$else$
+jsonObject.put("$property.name$", $property.defaultValueEscaped$);
+$endif$
+}$
+>>

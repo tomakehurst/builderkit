@@ -8,10 +8,10 @@ public class ThingBuilderTest {
 	public void outputJson() {
 		System.out.println(new ThingBuilder()
 			.withName("Tom")
-			.withFavouriteColour("Red")
-			.withLikesCheese(true)
-			.withNumberOfNoveltyMugs(5l)
-			.withPercentSatisfied(22.2)
+			.withAddress(new ThingBuilder.AddressBuilder()
+			    .withCity("York")
+			    .withFlags(new ThingBuilder.AddressBuilder.FlagsBuilder()
+			        .withMarketingOptIn(true)))
 			.asJson());
 	}
 }

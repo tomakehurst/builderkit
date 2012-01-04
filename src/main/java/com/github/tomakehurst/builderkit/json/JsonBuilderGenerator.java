@@ -2,45 +2,43 @@ package com.github.tomakehurst.builderkit.json;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 
 public class JsonBuilderGenerator {
 	
 	private final String packageName;
-	private final String className;
-	private final String templateContent;
-	private final JsonBuilderModel model;
+	private final STGroup templateGroup;
+	private final ObjectBuilderModel model;
 
-	public JsonBuilderGenerator(String packageName, String className, String sourceJson) throws ParseException {
+	public JsonBuilderGenerator(String packageName, String entityName, String sourceJson) throws ParseException {
 		this.packageName = packageName;
-		this.className = className;
-		this.model = new JsonBuilderModel(sourceJson);
-		templateContent = loadStringTemplateContent();
+		this.model = topLevelModel(entityName, sourceJson);
+		templateGroup = loadStringTemplateGroup();
+	}
+	
+	private ObjectBuilderModel topLevelModel(String entityName, String sourceJson) throws ParseException {
+	    JSONParser parser = new JSONParser();
+        Object obj = parser.parse(sourceJson);
+        return new ObjectBuilderModel(entityName, (JSONObject) obj);
 	}
 
-	private String loadStringTemplateContent() {
-		InputStream in = getClass().getResourceAsStream("/builder.st");
-		try {
-			return CharStreams.toString(new InputStreamReader(in));
-		} catch (IOException ioe) {
-			throw new Defect(ioe);
-		}
+	private STGroup loadStringTemplateGroup() {
+	    return new STGroupFile(getClass().getResource("/builder.stg"), Charsets.UTF_8.toString(), '$', '$');
 	}
 
 	public String generate() {
-		ST template = new ST(templateContent, '$', '$')
+		ST template = templateGroup.getInstanceOf("rootClass")
 			.add("package", packageName)
-			.add("className", className)
-			.add("isArray", false)
-			.add("properties", model.getProperties());
+			.add("model", model);
 		
 		return template.render();
 	}
@@ -48,7 +46,7 @@ public class JsonBuilderGenerator {
 	public void writeToFileUnder(String rootDirectory) throws IOException {
 		File packageDir = new File(rootDirectory, packageName.replace('.', '/'));
 		packageDir.mkdirs();
-		File javaFile = new File(packageDir, className + ".java");
+		File javaFile = new File(packageDir, model.getClassName() + ".java");
 		Files.write(generate(), javaFile, Charsets.UTF_8);
 	}
 }

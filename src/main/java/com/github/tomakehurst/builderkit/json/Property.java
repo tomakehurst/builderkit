@@ -1,33 +1,66 @@
 package com.github.tomakehurst.builderkit.json;
 
+import static com.github.tomakehurst.builderkit.json.Utils.firstCharToUppercase;
+
 import java.util.Map;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class Property {
 
 	private Type type;
-	private String name;
+	private String javaClassName;
+    private String name;
 	private Object defaultValue;
 	
 	public static Property fromJsonAttribute(Map.Entry<String, ?> attribute) {
 		return new Property(Type.fromClass(attribute.getValue().getClass()), attribute.getKey(), attribute.getValue());
 	}
 	
+	public Property(String javaClass, String name, Object defaultValue) {
+        this.javaClassName = javaClass;
+        this.name = name;
+        this.defaultValue = defaultValue;
+    }
+	
 	public Property(Type type, String name, Object defaultValue) {
 		this.type = type;
+		if (type == Type.OBJECT) {
+		    javaClassName = firstCharToUppercase(name) + "Builder";
+		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), (JSONObject) defaultValue);
+		} else if (type == Type.ARRAY) {
+		    //TODO: finish
+		    javaClassName = "List";
+		} else {
+		    javaClassName = type.getJavaClassNoPackage();
+		    this.defaultValue = defaultValue;
+		}
 		this.name = name;
-		this.defaultValue = defaultValue;
 	}
 
 	public Type getType() {
 		return type;
 	}
-
+	
+    public String getJavaClassName() {
+        return javaClassName;
+    }
+    
 	public String getName() {
 		return name;
 	}
 	
 	public String getNameFirstLetterUppercase() {
-		return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+		return firstCharToUppercase(name);
+	}
+	
+	public boolean isObject() {
+	    return type == Type.OBJECT;
+	}
+	
+	public boolean isArray() {
+	    return type == Type.ARRAY;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -35,11 +68,25 @@ public class Property {
 		return (T) defaultValue;
 	}
 	
-	public enum Type { 
+	public String getDefaultValueEscaped() {
+	    if (type == Type.STRING) {
+	        return '"' + String.valueOf(defaultValue) + '"';
+	    } else {
+	        return String.valueOf(defaultValue);
+	    }
+	}
+	
+	public ObjectBuilderModel getModel() {
+	    return (ObjectBuilderModel) defaultValue;
+	}
+	
+	public static enum Type { 
 		STRING(String.class),
 		LONG(Long.class),
 		DOUBLE(Double.class),
-		BOOLEAN(Boolean.class);
+		BOOLEAN(Boolean.class),
+		OBJECT(JSONObject.class),
+		ARRAY(JSONArray.class);
 	
 		private final Class<?> javaClass;
 
@@ -119,9 +166,10 @@ public class Property {
 	}
 	
 	@Override
-	public String toString() {
-		return "Property [type=" + type + ", name=" + name + ", defaultValue="
-				+ defaultValue + "]";
-	};
-	
+    public String toString() {
+        return "Property [getType()=" + getType() + ", getJavaClassName()=" + getJavaClassName() + ", getName()="
+                + getName() + ", getNameFirstLetterUppercase()=" + getNameFirstLetterUppercase() + ", isObject()="
+                + isObject() + ", isArray()=" + isArray() + ", getDefaultValue()=" + getDefaultValue() + "]";
+    }
+
 }

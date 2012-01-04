@@ -1,5 +1,6 @@
 package com.github.tomakehurst.builderkit.json;
 
+import static java.lang.System.out;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -21,13 +22,13 @@ public class JsonBuilderAcceptanceTest {
 			"	\"percentSatisfied\": 76.234				 	\n" +
 			"}";
 		
-		JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ThingBuilder", json);
+		JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "Thing", json);
 
 		generator.writeToFileUnder("src/generated/java");
 		assertTrue(new File("src/generated/java/com/test/something/ThingBuilder.java").exists());
 		
 		String builderJava = generator.generate();
-		System.out.println(builderJava);
+		out.println(builderJava);
 		
 		assertThat(builderJava, containsString("public ThingBuilder withName(String name)"));
 		assertThat(builderJava, containsString("public ThingBuilder withFavouriteColour(String favouriteColour)"));
@@ -44,14 +45,20 @@ public class JsonBuilderAcceptanceTest {
 			"	\"address\": { 									\n" +
 			"		\"houseNumber\": 12,	 					\n" +
 			"		\"street\": \"Wheat Street\",				\n" +
-			"		\"city\": \"Trumpton\"						\n" +
+			"		\"city\": \"Trumpton\",						\n" +
+			"       \"flags\": {                                \n" +
+			"            \"marketingOptIn\": true,              \n" +
+			"            \"shareWithPartners\": false           \n" +
+			"       }                                           \n" +
 			"	}											 	\n" +
 			"}";
 		
-		JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ThingBuilder", json);
+		JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "Thing", json);
 		String builderJava = generator.generate();
+		out.println(builderJava);
+		generator.writeToFileUnder("src/generated/java");
 		
-		assertThat(builderJava, containsString("public static class Address {"));
+		assertThat(builderJava, containsString("public static class AddressBuilder {"));
 		assertThat(builderJava, containsString("public Address withHouseNumber(Long houseNumber)"));
 		assertThat(builderJava, containsString("public Address withStreet(String street)"));
 		assertThat(builderJava, containsString("public Address withCity(String city)"));
