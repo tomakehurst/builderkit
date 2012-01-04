@@ -29,11 +29,31 @@ public class JsonBuilderAcceptanceTest {
 		String builderJava = generator.generate();
 		System.out.println(builderJava);
 		
-		
 		assertThat(builderJava, containsString("public ThingBuilder withName(String name)"));
 		assertThat(builderJava, containsString("public ThingBuilder withFavouriteColour(String favouriteColour)"));
 		assertThat(builderJava, containsString("public ThingBuilder withLikesCheese(Boolean likesCheese)"));
 		assertThat(builderJava, containsString("public ThingBuilder withNumberOfNoveltyMugs(Long numberOfNoveltyMugs)"));
 		assertThat(builderJava, containsString("public ThingBuilder withPercentSatisfied(Double percentSatisfied)"));
+	}
+	
+	@Test
+	public void generatesInnerClassesForNestedObjects() throws Exception {
+		String json =
+			"{ 													\n" +
+			"	\"name\": \"Thomas\", 							\n" +
+			"	\"address\": { 									\n" +
+			"		\"houseNumber\": 12,	 					\n" +
+			"		\"street\": \"Wheat Street\",				\n" +
+			"		\"city\": \"Trumpton\"						\n" +
+			"	}											 	\n" +
+			"}";
+		
+		JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ThingBuilder", json);
+		String builderJava = generator.generate();
+		
+		assertThat(builderJava, containsString("public static class Address {"));
+		assertThat(builderJava, containsString("public Address withHouseNumber(Long houseNumber)"));
+		assertThat(builderJava, containsString("public Address withStreet(String street)"));
+		assertThat(builderJava, containsString("public Address withCity(String city)"));
 	}
 }
