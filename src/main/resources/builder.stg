@@ -1,5 +1,33 @@
-rootClass(package, model) ::= <<
+listRootClass(package, model) ::= <<
+package $package$;
 
+import java.util.List;
+import org.json.simple.JSONArray;
+
+public class $model.className$ {
+	
+	private List<Object> jsonArray;
+
+	@SuppressWarnings("unchecked")	
+	public $model.className$() {
+		jsonArray = new JSONArray();
+		$defaultListItems(model)$
+	}
+	
+	public void add(Object obj) {
+		jsonArray.add(obj);
+	}
+	
+	public String asJson() {
+		return jsonArray.toString();
+	}
+	
+	$nestedInnerClasses(model)$
+}
+>>
+
+
+objectRootClass(package, model) ::= <<
 package $package$;
 
 import java.util.Map;
@@ -77,10 +105,25 @@ public $model.className$ with$property.nameFirstLetterUppercase$($property.javaC
 
 defaultValues(model) ::= <<
 $model.properties:{ property |
-$if(property.object)$
+$if(property.array)$
+jsonObject.put("$property.name$", new $property.javaClassName$().asJsonObject());
+$elseif(property.object)$
 jsonObject.put("$property.name$", new $property.javaClassName$().asJsonObject());
 $else$
 jsonObject.put("$property.name$", $property.defaultValueEscaped$);
+$endif$
+}$
+>>
+
+
+defaultListItems(model) ::= <<
+$model.properties:{ item |
+$if(item.array)$
+jsonArray.add(new $item.javaClassName$().asJsonObject());
+$elseif(item.object)$
+jsonArray.add(new $item.javaClassName$().asJsonObject());
+$else$
+jsonArray.add($item.defaultValueEscaped$);
 $endif$
 }$
 >>

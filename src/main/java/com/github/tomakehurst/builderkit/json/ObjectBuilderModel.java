@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Predicate;
@@ -17,15 +18,28 @@ public class ObjectBuilderModel {
 
     private final String entityName;
     private final List<Property> properties = newArrayList();
+    private final boolean isArray;
     
     @SuppressWarnings("unchecked")
-    public ObjectBuilderModel(String entityName, JSONObject obj) {
+    public ObjectBuilderModel(String entityName, Object obj) {
         this.entityName = entityName;
         
-        JSONObject jsonObject = obj;
-        Set<Map.Entry<String, ?>> attributes = jsonObject.entrySet();
-        for (Map.Entry<String, ?> attribute: attributes) {
-            properties.add(Property.fromJsonAttribute(attribute));
+        if (obj instanceof JSONObject) {
+            isArray = false;
+            JSONObject jsonObject = (JSONObject) obj;
+            Set<Map.Entry<String, ?>> attributes = jsonObject.entrySet();
+            for (Map.Entry<String, ?> attribute: attributes) {
+                properties.add(Property.fromJsonAttribute(attribute));
+            }
+        } else if (obj instanceof JSONArray) {
+            isArray = true;
+            JSONArray jsonArray = (JSONArray) obj;
+            int i = 0;
+            for (Object item: jsonArray) {
+                properties.add(Property.fromJsonValue("Anon" + ++i, item));
+            }
+        } else {
+            throw new IllegalArgumentException("Object passed must be either JSONObject or JSONArray");
         }
     }
     
@@ -55,6 +69,10 @@ public class ObjectBuilderModel {
     
     public String getClassName() {
         return entityName + "Builder";
+    }
+
+    public boolean isArray() {
+        return isArray;
     }
     
     

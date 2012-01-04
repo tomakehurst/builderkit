@@ -18,6 +18,10 @@ public class Property {
 		return new Property(Type.fromClass(attribute.getValue().getClass()), attribute.getKey(), attribute.getValue());
 	}
 	
+	public static Property fromJsonValue(String key, Object value) {
+        return new Property(Type.fromClass(value.getClass()), key, value);
+    }
+	
 	public Property(String javaClass, String name, Object defaultValue) {
         this.javaClassName = javaClass;
         this.name = name;
@@ -30,8 +34,8 @@ public class Property {
 		    javaClassName = firstCharToUppercase(name) + "Builder";
 		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), (JSONObject) defaultValue);
 		} else if (type == Type.ARRAY) {
-		    //TODO: finish
-		    javaClassName = "List";
+		    javaClassName = "Object...";
+		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), (JSONArray) defaultValue);
 		} else {
 		    javaClassName = type.getJavaClassNoPackage();
 		    this.defaultValue = defaultValue;

@@ -3,7 +3,6 @@ package com.github.tomakehurst.builderkit.json;
 import java.io.File;
 import java.io.IOException;
 
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.stringtemplate.v4.ST;
@@ -17,10 +16,12 @@ public class JsonBuilderGenerator {
 	
 	private final String packageName;
 	private final STGroup templateGroup;
+	private final String className;
 	private final ObjectBuilderModel model;
 
 	public JsonBuilderGenerator(String packageName, String entityName, String sourceJson) throws ParseException {
 		this.packageName = packageName;
+		this.className = entityName + "Builder";
 		this.model = topLevelModel(entityName, sourceJson);
 		templateGroup = loadStringTemplateGroup();
 	}
@@ -28,7 +29,8 @@ public class JsonBuilderGenerator {
 	private ObjectBuilderModel topLevelModel(String entityName, String sourceJson) throws ParseException {
 	    JSONParser parser = new JSONParser();
         Object obj = parser.parse(sourceJson);
-        return new ObjectBuilderModel(entityName, (JSONObject) obj);
+        return new ObjectBuilderModel(entityName, obj);
+        
 	}
 
 	private STGroup loadStringTemplateGroup() {
@@ -36,7 +38,8 @@ public class JsonBuilderGenerator {
 	}
 
 	public String generate() {
-		ST template = templateGroup.getInstanceOf("rootClass")
+	    String templateName = model.isArray() ? "listRootClass" : "objectRootClass";
+		ST template = templateGroup.getInstanceOf(templateName)
 			.add("package", packageName)
 			.add("model", model);
 		
@@ -46,7 +49,7 @@ public class JsonBuilderGenerator {
 	public void writeToFileUnder(String rootDirectory) throws IOException {
 		File packageDir = new File(rootDirectory, packageName.replace('.', '/'));
 		packageDir.mkdirs();
-		File javaFile = new File(packageDir, model.getClassName() + ".java");
+		File javaFile = new File(packageDir, className + ".java");
 		Files.write(generate(), javaFile, Charsets.UTF_8);
 	}
 }

@@ -59,8 +59,48 @@ public class JsonBuilderAcceptanceTest {
 		generator.writeToFileUnder("src/generated/java");
 		
 		assertThat(builderJava, containsString("public static class AddressBuilder {"));
-		assertThat(builderJava, containsString("public Address withHouseNumber(Long houseNumber)"));
-		assertThat(builderJava, containsString("public Address withStreet(String street)"));
-		assertThat(builderJava, containsString("public Address withCity(String city)"));
+		assertThat(builderJava, containsString("public AddressBuilder withHouseNumber(Long houseNumber)"));
+		assertThat(builderJava, containsString("public AddressBuilder withStreet(String street)"));
+		assertThat(builderJava, containsString("public AddressBuilder withCity(String city)"));
+		
+		assertThat(builderJava, containsString("public FlagsBuilder withMarketingOptIn(Boolean marketingOptIn)"));
+		assertThat(builderJava, containsString("public FlagsBuilder withShareWithPartners(Boolean shareWithPartners)"));
+	}
+	
+	@Test
+    public void generatesListRootedBuilder() throws Exception {
+	    String json =
+	        "[                                                    \n" +
+            "   \"Thomas\",                                       \n" +
+            "   \"Matthew\",                                      \n" +
+            "   { \"key\": \"value\" },                            \n" +
+            "   15                                                 \n" +
+            "]                                                      ";
+	    
+	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ListyThing", json);
+        String builderJava = generator.generate();
+        out.println(builderJava);
+        generator.writeToFileUnder("src/generated/java");
+	}
+	
+	@Test
+	public void generatesBuilderForMixedObjectsAndArrays() throws Exception {
+	    String json =
+            "{                                                  \n" +
+            "   \"name\": \"Thomas\",                           \n" +
+            "   \"things\": [                                   \n" +
+            "       {                                           \n" +
+            "           \"description\": \"dull\"               \n" +
+            "       },                                          \n" +
+            "       {                                           \n" +
+            "           \"description\": \"bright\"             \n" +
+            "       }                                           \n" +
+            "   ]                                               \n" +
+            "}";
+	    
+	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ObjectyListyThing", json);
+        String builderJava = generator.generate();
+        out.println(builderJava);
+        generator.writeToFileUnder("src/generated/java");
 	}
 }
