@@ -34,8 +34,9 @@ public class Property {
 		    javaClassName = firstCharToUppercase(name) + "Builder";
 		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), (JSONObject) defaultValue);
 		} else if (type == Type.ARRAY) {
-		    javaClassName = "Object...";
-		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), (JSONArray) defaultValue);
+		    javaClassName = firstCharToUppercase(name) + "Builder";
+		    JSONObject firstValue = (JSONObject) ((JSONArray) defaultValue).get(0);
+		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), firstValue);
 		} else {
 		    javaClassName = type.getJavaClassNoPackage();
 		    this.defaultValue = defaultValue;

@@ -1,8 +1,8 @@
 listRootClass(package, model) ::= <<
 package $package$;
 
-import java.util.List;
-import org.json.simple.JSONArray;
+import java.util.*;
+import org.json.simple.*;
 
 public class $model.className$ {
 	
@@ -30,8 +30,8 @@ public class $model.className$ {
 objectRootClass(package, model) ::= <<
 package $package$;
 
-import java.util.Map;
-import org.json.simple.JSONObject;
+import java.util.*;
+import org.json.simple.*;
 
 public class $model.className$ {
 	
@@ -88,10 +88,20 @@ $endif$
 
 
 withMethods(model) ::= <<
-$model.properties:{ property | 
+$model.properties:{ property |
+$if(property.array)$
+@SuppressWarnings("unchecked")
+public $model.className$ with$property.nameFirstLetterUppercase$($property.javaClassName$... $property.name$) {
+$else$
 public $model.className$ with$property.nameFirstLetterUppercase$($property.javaClassName$ $property.name$) {
+$endif$
 	$if(property.object)$
 	jsonObject.put("$property.name$", $property.name$.asJsonObject());
+	$elseif(property.array)$
+	JSONArray jsonArray = (JSONArray) jsonObject.get("$property.name$");
+	for ($property.javaClassName$ item: $property.name$) {
+		jsonArray.add(item.asJsonObject());
+	\}
 	$else$
 	jsonObject.put("$property.name$", $property.name$);
 	$endif$
@@ -106,7 +116,7 @@ public $model.className$ with$property.nameFirstLetterUppercase$($property.javaC
 defaultValues(model) ::= <<
 $model.properties:{ property |
 $if(property.array)$
-jsonObject.put("$property.name$", new $property.javaClassName$().asJsonObject());
+jsonObject.put("$property.name$", Arrays.asList(new $property.javaClassName$().asJsonObject()));
 $elseif(property.object)$
 jsonObject.put("$property.name$", new $property.javaClassName$().asJsonObject());
 $else$

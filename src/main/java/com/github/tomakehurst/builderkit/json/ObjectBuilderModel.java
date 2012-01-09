@@ -12,6 +12,7 @@ import java.util.Set;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.github.tomakehurst.builderkit.json.Property.Type;
 import com.google.common.base.Predicate;
 
 public class ObjectBuilderModel {
@@ -51,6 +52,10 @@ public class ObjectBuilderModel {
         return newArrayList(filter(properties, onlyObjectProperties()));
     }
     
+//    public Iterable<Property> getArrayProperties() {
+//        return newArrayList(filter(properties, onlyObjectProperties()));
+//    }
+    
     public boolean getHasObjectProperties() {
         return size(getObjectProperties()) > 0;
     }
@@ -58,7 +63,7 @@ public class ObjectBuilderModel {
     private Predicate<Property> onlyObjectProperties() {
         return new Predicate<Property>() {
             public boolean apply(Property input) {
-                return input.getType() == OBJECT;
+                return input.getType() == OBJECT || input.getType() == Type.ARRAY;
             }
         };
     }
