@@ -1,4 +1,5 @@
-package com.github.tomakehurst.builderkit.json;
+package com.github.tomakehurst.builderkit;
+
 
 public class Name {
 

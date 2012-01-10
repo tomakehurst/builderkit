@@ -1,4 +1,4 @@
-package com.github.tomakehurst.builderkit.json;
+package com.github.tomakehurst.builderkit;
 
 /*
  * JBoss DNA (http://www.jboss.org/dna)

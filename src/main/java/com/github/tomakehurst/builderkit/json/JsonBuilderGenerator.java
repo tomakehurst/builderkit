@@ -9,6 +9,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
+import com.github.tomakehurst.builderkit.Name;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 

@@ -12,6 +12,7 @@ import java.util.Set;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.github.tomakehurst.builderkit.Name;
 import com.github.tomakehurst.builderkit.json.Property.Type;
 import com.google.common.base.Predicate;
 

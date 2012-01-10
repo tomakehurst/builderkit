@@ -5,6 +5,8 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.github.tomakehurst.builderkit.Name;
+
 public class Property {
 
 	private Type type;
