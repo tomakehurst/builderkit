@@ -46,7 +46,7 @@ public class JsonBuilderAcceptanceTest {
 			"		\"houseNumber\": 12,	 					\n" +
 			"		\"street\": \"Wheat Street\",				\n" +
 			"		\"city\": \"Trumpton\",						\n" +
-			"       \"flags\": {                                \n" +
+			"       \"optionSet\": {                            \n" +
 			"            \"marketingOptIn\": true,              \n" +
 			"            \"shareWithPartners\": false           \n" +
 			"       }                                           \n" +
@@ -63,8 +63,8 @@ public class JsonBuilderAcceptanceTest {
 		assertThat(builderJava, containsString("public AddressBuilder withStreet(String street)"));
 		assertThat(builderJava, containsString("public AddressBuilder withCity(String city)"));
 		
-		assertThat(builderJava, containsString("public FlagsBuilder withMarketingOptIn(Boolean marketingOptIn)"));
-		assertThat(builderJava, containsString("public FlagsBuilder withShareWithPartners(Boolean shareWithPartners)"));
+		assertThat(builderJava, containsString("public OptionSetBuilder withMarketingOptIn(Boolean marketingOptIn)"));
+		assertThat(builderJava, containsString("public OptionSetBuilder withShareWithPartners(Boolean shareWithPartners)"));
 	}
 	
 	@Test

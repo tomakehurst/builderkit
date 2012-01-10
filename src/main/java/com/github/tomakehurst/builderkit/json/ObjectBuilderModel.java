@@ -18,12 +18,16 @@ import com.google.common.base.Predicate;
 public class ObjectBuilderModel {
 
     private final String entityName;
+    private final Name name;
     private final List<Property> properties = newArrayList();
     private final boolean isArray;
+    private String jsonSource;
     
     @SuppressWarnings("unchecked")
-    public ObjectBuilderModel(String entityName, Object obj) {
-        this.entityName = entityName;
+    public ObjectBuilderModel(Name name, Object obj) {
+        this.name = name;
+        this.jsonSource = obj.toString();
+        this.entityName = name.toString();
         
         if (obj instanceof JSONObject) {
             isArray = false;
@@ -67,18 +71,16 @@ public class ObjectBuilderModel {
             }
         };
     }
-
-    public String getEntityName() {
-        return entityName;
+    
+    public Name getName() {
+        return name;
     }
     
-    public String getClassName() {
-        return entityName + "Builder";
-    }
-
     public boolean isArray() {
         return isArray;
     }
     
-    
+    public String getJsonSourceStringEscaped() {
+        return jsonSource.replace("\"", "\\\"");
+    }
 }

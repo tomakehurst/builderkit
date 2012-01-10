@@ -1,18 +1,19 @@
 listRootClass(package, model) ::= <<
 package $package$;
 
-import java.util.*;
-import org.json.simple.*;
+$imports()$
 
-public class $model.className$ {
+public class $model.name.singularBuilderClassName$ {
 	
 	private List<Object> jsonArray;
 
-	@SuppressWarnings("unchecked")	
-	public $model.className$() {
-		jsonArray = new JSONArray();
-		$defaultListItems(model)$
+	public $model.name.singularBuilderClassName$() {
+		jsonArray = parse("$model.jsonSourceStringEscaped$");
 	}
+	
+	$staticFactoryMethod(model)$
+	
+	$parseMethod()$
 	
 	public void add(Object obj) {
 		jsonArray.add(obj);
@@ -30,18 +31,19 @@ public class $model.className$ {
 objectRootClass(package, model) ::= <<
 package $package$;
 
-import java.util.*;
-import org.json.simple.*;
+$imports()$
 
-public class $model.className$ {
+public class $model.name.singularBuilderClassName$ {
 	
 	private Map<String, Object> jsonObject;
 
-	@SuppressWarnings("unchecked")	
-	public $model.className$() {
-		jsonObject = new JSONObject();
-		$defaultValues(model)$
+	public $model.name.singularBuilderClassName$() {
+		jsonObject = parse("$model.jsonSourceStringEscaped$");
 	}
+	
+	$staticFactoryMethod(model)$
+	
+	$parseMethod()$
 	
 	$withMethods(model)$
 	
@@ -54,17 +56,24 @@ public class $model.className$ {
 >>
 
 
+imports() ::= <<
+import java.util.*;
+import org.json.simple.*;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+>>
+
 
 innerClass(model) ::= <<
-public static class $model.className$ {
+public static class $model.name.singularBuilderClassName$ {
 
 	private Map<String, Object> jsonObject;
 
-	@SuppressWarnings("unchecked")	
-	public $model.className$() {
-		jsonObject = new JSONObject();
-		$defaultValues(model)$
+	public $model.name.singularBuilderClassName$() {
+		jsonObject = parse("$model.jsonSourceStringEscaped$");
 	}
+	
+	$staticFactoryMethod(model)$
 
 	$withMethods(model)$
 	
@@ -91,15 +100,16 @@ withMethods(model) ::= <<
 $model.properties:{ property |
 $if(property.array)$
 @SuppressWarnings("unchecked")
-public $model.className$ with$property.nameFirstLetterUppercase$($property.javaClassName$... $property.name$) {
+public $model.name.singularBuilderClassName$ with$property.name.upperCaseFirstLetterForm$($property.name.singularBuilderClassName$... $property.name$) {
 $else$
-public $model.className$ with$property.nameFirstLetterUppercase$($property.javaClassName$ $property.name$) {
+public $model.name.singularBuilderClassName$ with$property.name.upperCaseFirstLetterForm$($property.javaClassName$ $property.name$) {
 $endif$
 	$if(property.object)$
 	jsonObject.put("$property.name$", $property.name$.asJsonObject());
 	$elseif(property.array)$
 	JSONArray jsonArray = (JSONArray) jsonObject.get("$property.name$");
-	for ($property.javaClassName$ item: $property.name$) {
+	jsonArray.clear();
+	for ($property.name.singularBuilderClassName$ item: $property.name$) {
 		jsonArray.add(item.asJsonObject());
 	\}
 	$else$
@@ -112,28 +122,21 @@ $endif$
 >>
 
 
-
-defaultValues(model) ::= <<
-$model.properties:{ property |
-$if(property.array)$
-jsonObject.put("$property.name$", Arrays.asList(new $property.javaClassName$().asJsonObject()));
-$elseif(property.object)$
-jsonObject.put("$property.name$", new $property.javaClassName$().asJsonObject());
-$else$
-jsonObject.put("$property.name$", $property.defaultValueEscaped$);
-$endif$
-}$
+parseMethod() ::= <<
+@SuppressWarnings("unchecked")
+private static <T> T parse(String json) {
+	try {
+		return (T) new JSONParser().parse(json);
+	\} catch (ParseException e) {
+		throw new IllegalArgumentException(e);
+	\}
+\}
 >>
 
 
-defaultListItems(model) ::= <<
-$model.properties:{ item |
-$if(item.array)$
-jsonArray.add(new $item.javaClassName$().asJsonObject());
-$elseif(item.object)$
-jsonArray.add(new $item.javaClassName$().asJsonObject());
-$else$
-jsonArray.add($item.defaultValueEscaped$);
-$endif$
-}$
+
+staticFactoryMethod(model) ::= <<
+public static $model.name.singularBuilderClassName$ $model.name.indefiniteArticleForm$() {
+	return new $model.name.singularBuilderClassName$();
+\}
 >>

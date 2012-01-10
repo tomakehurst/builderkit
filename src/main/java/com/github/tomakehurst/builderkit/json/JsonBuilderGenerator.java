@@ -29,7 +29,7 @@ public class JsonBuilderGenerator {
 	private ObjectBuilderModel topLevelModel(String entityName, String sourceJson) throws ParseException {
 	    JSONParser parser = new JSONParser();
         Object obj = parser.parse(sourceJson);
-        return new ObjectBuilderModel(entityName, obj);
+        return new ObjectBuilderModel(new Name(entityName), obj);
         
 	}
 

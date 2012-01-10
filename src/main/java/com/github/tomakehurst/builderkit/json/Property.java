@@ -1,7 +1,5 @@
 package com.github.tomakehurst.builderkit.json;
 
-import static com.github.tomakehurst.builderkit.json.Utils.firstCharToUppercase;
-
 import java.util.Map;
 
 import org.json.simple.JSONArray;
@@ -11,7 +9,7 @@ public class Property {
 
 	private Type type;
 	private String javaClassName;
-    private String name;
+    private Name name;
 	private Object defaultValue;
 	
 	public static Property fromJsonAttribute(Map.Entry<String, ?> attribute) {
@@ -24,24 +22,24 @@ public class Property {
 	
 	public Property(String javaClass, String name, Object defaultValue) {
         this.javaClassName = javaClass;
-        this.name = name;
+        this.name = new Name(name);
         this.defaultValue = defaultValue;
     }
 	
-	public Property(Type type, String name, Object defaultValue) {
+	public Property(Type type, String propertyName, Object defaultValue) {
 		this.type = type;
+		this.name = new Name(propertyName);
 		if (type == Type.OBJECT) {
-		    javaClassName = firstCharToUppercase(name) + "Builder";
-		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), (JSONObject) defaultValue);
+		    javaClassName = name.getBuilderClassName();
+		    this.defaultValue = new ObjectBuilderModel(name, (JSONObject) defaultValue);
 		} else if (type == Type.ARRAY) {
-		    javaClassName = firstCharToUppercase(name) + "Builder";
+		    javaClassName = name.getBuilderClassName();
 		    JSONObject firstValue = (JSONObject) ((JSONArray) defaultValue).get(0);
-		    this.defaultValue = new ObjectBuilderModel(firstCharToUppercase(name), firstValue);
+		    this.defaultValue = new ObjectBuilderModel(name, firstValue);
 		} else {
 		    javaClassName = type.getJavaClassNoPackage();
 		    this.defaultValue = defaultValue;
 		}
-		this.name = name;
 	}
 
 	public Type getType() {
@@ -52,12 +50,8 @@ public class Property {
         return javaClassName;
     }
     
-	public String getName() {
+	public Name getName() {
 		return name;
-	}
-	
-	public String getNameFirstLetterUppercase() {
-		return firstCharToUppercase(name);
 	}
 	
 	public boolean isObject() {
@@ -119,49 +113,6 @@ public class Property {
 		}
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((defaultValue == null) ? 0 : defaultValue.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Property other = (Property) obj;
-		if (defaultValue == null) {
-			if (other.defaultValue != null) {
-				return false;
-			}
-		} else if (!defaultValueEquals(other.defaultValue)) {
-			return false;
-		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		if (type != other.type) {
-			return false;
-		}
-		return true;
-	}
-	
 	private boolean defaultValueEquals(Object otherDefaultValue) {
 		if (defaultValue instanceof Number) {
 			return ((Number) defaultValue).doubleValue() == ((Number) otherDefaultValue).doubleValue();
@@ -169,12 +120,62 @@ public class Property {
 			return defaultValue.equals(otherDefaultValue);
 		}
 	}
-	
-	@Override
-    public String toString() {
-        return "Property [getType()=" + getType() + ", getJavaClassName()=" + getJavaClassName() + ", getName()="
-                + getName() + ", getNameFirstLetterUppercase()=" + getNameFirstLetterUppercase() + ", isObject()="
-                + isObject() + ", isArray()=" + isArray() + ", getDefaultValue()=" + getDefaultValue() + "]";
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
+        result = prime * result + ((javaClassName == null) ? 0 : javaClassName.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Property other = (Property) obj;
+        if (defaultValue == null) {
+            if (other.defaultValue != null) {
+                return false;
+            }
+        } else if (!defaultValueEquals(other.defaultValue)) {
+            return false;
+        }
+        if (javaClassName == null) {
+            if (other.javaClassName != null) {
+                return false;
+            }
+        } else if (!javaClassName.equals(other.javaClassName)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (type != other.type) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Property [getType()=" + getType() + ", getJavaClassName()=" + getJavaClassName() + ", getName()="
+                + getName() + ", isObject()=" + isObject() + ", isArray()=" + isArray() + ", getDefaultValue()="
+                + getDefaultValue() + ", getDefaultValueEscaped()=" + getDefaultValueEscaped() + ", getModel()="
+                + getModel() + "]";
+    }
 }
