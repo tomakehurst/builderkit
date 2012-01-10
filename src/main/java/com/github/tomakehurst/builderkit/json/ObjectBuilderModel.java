@@ -82,6 +82,6 @@ public class ObjectBuilderModel {
     }
     
     public String getJsonSourceStringEscaped() {
-        return jsonSource.replace("\"", "\\\"");
+        return jsonSource.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }
