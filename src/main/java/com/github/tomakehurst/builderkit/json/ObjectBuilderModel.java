@@ -18,7 +18,6 @@ import com.google.common.base.Predicate;
 
 public class ObjectBuilderModel {
 
-    private final String entityName;
     private final Name name;
     private final List<Property> properties = newArrayList();
     private final boolean isArray;
@@ -28,7 +27,6 @@ public class ObjectBuilderModel {
     public ObjectBuilderModel(Name name, Object obj) {
         this.name = name;
         this.jsonSource = obj.toString();
-        this.entityName = name.toString();
         
         if (obj instanceof JSONObject) {
             isArray = false;
@@ -56,10 +54,6 @@ public class ObjectBuilderModel {
     public Iterable<Property> getObjectProperties() {
         return newArrayList(filter(properties, onlyObjectProperties()));
     }
-    
-//    public Iterable<Property> getArrayProperties() {
-//        return newArrayList(filter(properties, onlyObjectProperties()));
-//    }
     
     public boolean getHasObjectProperties() {
         return size(getObjectProperties()) > 0;
