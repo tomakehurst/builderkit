@@ -11,7 +11,7 @@ public class $model.name.singularBuilderClassName$ {
 		jsonArray = parse("$model.jsonSourceStringEscaped$");
 	}
 	
-	$staticFactoryMethod(model)$
+	$staticFactoryMethod(model, model.name.singularBuilderClassName)$
 	
 	$parseMethod()$
 	
@@ -41,11 +41,11 @@ public class $model.name.singularBuilderClassName$ {
 		jsonObject = parse("$model.jsonSourceStringEscaped$");
 	}
 	
-	$staticFactoryMethod(model)$
+	$staticFactoryMethod(model, model.name.singularBuilderClassName)$
 	
 	$parseMethod()$
 	
-	$withMethods(model)$
+	$withMethods(model, model.name.singularBuilderClassName)$
 	
 	public String asJson() {
 		return jsonObject.toString();
@@ -64,18 +64,34 @@ import org.json.simple.parser.ParseException;
 >>
 
 
-innerClass(model) ::= <<
-public static class $model.name.singularBuilderClassName$ {
+nestedInnerClasses(model) ::= <<
+$if(model.hasObjectProperties)$
+$model.objectProperties:{ prop | 
+$objectNestedBuilder(prop.model)$
+}$
+$endif$
+
+$if(model.hasArrayProperties)$
+$model.arrayProperties:{ prop | 
+$arrayItemNestedBuilder(prop.model)$
+}$
+$endif$
+>>
+
+
+
+objectNestedBuilder(model) ::= <<
+public static class $model.name.builderClassName$ {
 
 	private Map<String, Object> jsonObject;
 
-	public $model.name.singularBuilderClassName$() {
+	public $model.name.builderClassName$() {
 		jsonObject = parse("$model.jsonSourceStringEscaped$");
 	}
 	
-	$staticFactoryMethod(model)$
+	$staticFactoryMethod(model, model.name.builderClassName)$
 
-	$withMethods(model)$
+	$withMethods(model, model.name.builderClassName)$
 	
 	public Map<String, Object> asJsonObject() {
 		return jsonObject;
@@ -86,23 +102,37 @@ public static class $model.name.singularBuilderClassName$ {
 >>
 
 
-nestedInnerClasses(model) ::= <<
-$if(model.hasObjectProperties)$
-$model.objectProperties:{ objectProp | 
-$innerClass(objectProp.model)$
-}$
-$endif$
+
+arrayItemNestedBuilder(model) ::= <<
+public static class $model.name.singularBuilderClassName$ {
+
+	private Map<String, Object> jsonObject;
+
+	public $model.name.singularBuilderClassName$() {
+		jsonObject = parse("$model.jsonSourceStringEscaped$");
+	}
+	
+	$staticFactoryMethod(model, model.name.singularBuilderClassName)$
+
+	$withMethods(model, model.name.singularBuilderClassName)$
+	
+	public Map<String, Object> asJsonObject() {
+		return jsonObject;
+	}
+
+	$nestedInnerClasses(model)$
+\}
 >>
 
 
 
-withMethods(model) ::= <<
+withMethods(model, builderClassName) ::= <<
 $model.properties:{ property |
 $if(property.array)$
 @SuppressWarnings("unchecked")
-public $model.name.singularBuilderClassName$ with$property.name.upperCaseFirstLetterForm$($property.name.singularBuilderClassName$... $property.name$) {
+public $builderClassName$ with$property.name.upperCaseFirstLetterForm$($property.name.singularBuilderClassName$... $property.name$) {
 $else$
-public $model.name.singularBuilderClassName$ with$property.name.upperCaseFirstLetterForm$($property.javaClassName$ $property.name$) {
+public $builderClassName$ with$property.name.upperCaseFirstLetterForm$($property.javaClassName$ $property.name$) {
 $endif$
 	$if(property.object)$
 	jsonObject.put("$property.name$", $property.name$.asJsonObject());
@@ -135,8 +165,8 @@ private static <T> T parse(String json) {
 
 
 
-staticFactoryMethod(model) ::= <<
-public static $model.name.singularBuilderClassName$ $model.name.indefiniteArticleForm$() {
-	return new $model.name.singularBuilderClassName$();
+staticFactoryMethod(model, builderClassName) ::= <<
+public static $builderClassName$ $model.name.indefiniteArticleForm$() {
+	return new $builderClassName$();
 \}
 >>

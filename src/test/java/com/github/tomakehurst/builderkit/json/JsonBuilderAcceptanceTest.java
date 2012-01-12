@@ -9,6 +9,9 @@ import java.io.File;
 
 import org.junit.Test;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+
 public class JsonBuilderAcceptanceTest {
 
 	@Test
@@ -102,5 +105,12 @@ public class JsonBuilderAcceptanceTest {
         String builderJava = generator.generate();
         out.println(builderJava);
         generator.writeToFileUnder("src/generated/java");
+	}
+	
+	@Test
+	public void real() throws Exception {
+	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "XBandHistory",
+	            Files.toString(new File("/Users/takehurst/CastApps/workspace/cast/trunk/cast-apps-web/src/test/resources/xband-history-1.json"), Charsets.UTF_8));
+	    generator.writeToFileUnder("src/generated/java");
 	}
 }
