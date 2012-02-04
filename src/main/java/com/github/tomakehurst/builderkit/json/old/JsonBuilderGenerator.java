@@ -1,4 +1,4 @@
-package com.github.tomakehurst.builderkit.json;
+package com.github.tomakehurst.builderkit.json.old;
 
 import java.io.File;
 import java.io.IOException;

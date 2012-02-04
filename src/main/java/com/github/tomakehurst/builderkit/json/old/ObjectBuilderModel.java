@@ -1,7 +1,7 @@
-package com.github.tomakehurst.builderkit.json;
+package com.github.tomakehurst.builderkit.json.old;
 
-import static com.github.tomakehurst.builderkit.json.Property.Type.ARRAY;
-import static com.github.tomakehurst.builderkit.json.Property.Type.OBJECT;
+import static com.github.tomakehurst.builderkit.json.old.Property.Type.OBJECT;
+import static com.github.tomakehurst.builderkit.json.old.Property.Type.OBJECT_ARRAY;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
@@ -14,7 +14,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.github.tomakehurst.builderkit.Name;
-import com.github.tomakehurst.builderkit.json.Property.Type;
+import com.github.tomakehurst.builderkit.json.old.Property.Type;
 import com.google.common.base.Predicate;
 
 public class ObjectBuilderModel {
@@ -57,7 +57,7 @@ public class ObjectBuilderModel {
     }
     
     public Iterable<Property> getArrayProperties() {
-        return newArrayList(filter(properties, onlyPropertiesOfType(ARRAY)));
+        return newArrayList(filter(properties, onlyPropertiesOfType(OBJECT_ARRAY)));
     }
     
     public boolean getHasObjectProperties() {

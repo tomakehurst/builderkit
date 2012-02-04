@@ -1,4 +1,4 @@
-package com.github.tomakehurst.builderkit.json;
+package com.github.tomakehurst.builderkit.json.old;
 
 import java.util.Map;
 
@@ -34,10 +34,15 @@ public class Property {
 		if (type == Type.OBJECT) {
 		    javaClassName = name.getBuilderClassName();
 		    this.defaultValue = new ObjectBuilderModel(name, (JSONObject) defaultValue);
-		} else if (type == Type.ARRAY) {
+		} else if (type == Type.OBJECT_ARRAY) {
 		    javaClassName = name.getBuilderClassName();
-		    JSONObject firstValue = (JSONObject) ((JSONArray) defaultValue).get(0);
-		    this.defaultValue = new ObjectBuilderModel(name, firstValue);
+		    Object firstValue = ((JSONArray) defaultValue).get(0);
+		    if (firstValue instanceof JSONObject) {
+		    	JSONObject firstValueObject = (JSONObject) firstValue;
+			    this.defaultValue = new ObjectBuilderModel(name, firstValueObject);
+		    } else {
+		    	this.defaultValue = firstValue;
+		    }
 		} else {
 		    javaClassName = type.getJavaClassNoPackage();
 		    this.defaultValue = defaultValue;
@@ -61,7 +66,7 @@ public class Property {
 	}
 	
 	public boolean isArray() {
-	    return type == Type.ARRAY;
+	    return type == Type.OBJECT_ARRAY;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,7 +92,8 @@ public class Property {
 		DOUBLE(Double.class),
 		BOOLEAN(Boolean.class),
 		OBJECT(JSONObject.class),
-		ARRAY(JSONArray.class);
+		OBJECT_ARRAY(JSONArray.class),
+		SCALAR_ARRAY(JSONArray.class);
 	
 		private final Class<?> javaClass;
 

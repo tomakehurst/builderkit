@@ -1,4 +1,4 @@
-package com.github.tomakehurst.builderkit.json;
+package com.github.tomakehurst.builderkit.json.old;
 
 import static java.lang.System.out;
 import static junit.framework.Assert.assertTrue;
@@ -9,8 +9,7 @@ import java.io.File;
 
 import org.junit.Test;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
+import com.github.tomakehurst.builderkit.json.old.JsonBuilderGenerator;
 
 public class JsonBuilderAcceptanceTest {
 
@@ -101,16 +100,24 @@ public class JsonBuilderAcceptanceTest {
             "   ]                                               \n" +
             "}";
 	    
-	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ObjectyListyThing", json);
+	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ObjectyListyThings", json);
         String builderJava = generator.generate();
         out.println(builderJava);
         generator.writeToFileUnder("src/generated/java");
 	}
 	
 	@Test
-	public void real() throws Exception {
-	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "XBandHistory",
-	            Files.toString(new File("/Users/takehurst/CastApps/workspace/cast/trunk/cast-apps-web/src/test/resources/xband-history-1.json"), Charsets.UTF_8));
-	    generator.writeToFileUnder("src/generated/java");
+	public void scalarLists() throws Exception {
+		String json =
+            "{                                                  \n" +
+            "   \"numbers\": [ 1, 2, 3 ],                       \n" +
+            "   \"strings\": [ \"one\", \"two\", \"three\" ],   \n" +
+            "   \"booleans\": [ true, false, true ]             \n" +
+            "}";
+	    
+	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ScalarLists", json);
+        String builderJava = generator.generate();
+        out.println(builderJava);
+        generator.writeToFileUnder("src/generated/java");
 	}
 }
