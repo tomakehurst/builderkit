@@ -86,7 +86,7 @@ public class BuilderClassTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void hasOneScalarArrayWithMethodWhenRootObjectIsArray() {
+	public void hasOneScalarArrayWithMethodWhenRootObjectIsScalarArray() {
 		JSONArray obj = new JSONArray();
 		obj.add(true);
 		
@@ -95,6 +95,40 @@ public class BuilderClassTest {
 		
 		assertThat(builderClass.getWithMethods(), hasItems(
 				allOf(named("withItem"), returnType("BooleansBuilder"), argumentType("Boolean..."))
+		));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void hasOneObjectArrayWithMethodWhenRootObjectIsObjectArray() {
+		JSONArray obj = new JSONArray();
+		JSONObject element = new JSONObject();
+		element.put("flavour", "Peach");
+		obj.add(element);
+		
+		JsonDocumentModel model = JsonDocumentModel.createFrom(obj);
+		BuilderClass builderClass = BuilderClass.fromRootAttribute(model.getRootAttribute(), "Flavours");
+		
+		assertThat(builderClass.getWithMethods(), hasItems(
+				allOf(named("withItem"), returnType("FlavoursBuilder"), argumentType("ItemBuilder..."))
+		));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void returnsInnerBuilderClassForNestedObject() {
+		JSONObject obj = new JSONObject();
+		JSONObject inner = new JSONObject();
+		obj.put("innerThing", inner);
+		inner.put("someKey", "Some value");
+		
+		JsonDocumentModel model = JsonDocumentModel.createFrom(obj);
+		BuilderClass builderClass = BuilderClass.fromRootAttribute(model.getRootAttribute(), "NestedObject");
+		
+		BuilderClass innerBuilder = builderClass.getInnerBuilderClasses().get(0);
+		
+		assertThat(innerBuilder.getWithMethods(), hasItems(
+				allOf(named("withSomeKey"), returnType("InnerThingBuilder"), argumentType("String"))
 		));
 	}
 }

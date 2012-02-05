@@ -87,8 +87,8 @@ public class JsonDocumentModelTest {
 		
 		ArrayAttribute residents = (ArrayAttribute) getFrom(address.getChildAttributes(), withTypeAndName(ARRAY, "residents"));
 		assertThat(residents.getElementType(), is(OBJECT));
-		assertThat(residents.getElementAttributes(), hasItems(withTypeAndName(STRING, "name")));
-		
+		assertThat(residents.getElementAttribute().getChildAttributes(), hasItems(withTypeAndName(STRING, "name")));
+		assertThat(residents.getElementAttribute(), withTypeAndName(OBJECT, "resident"));
 	}
 	
 	private <T> T getFrom(Iterable<T> items, final Matcher<T> matcher) {

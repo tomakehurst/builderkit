@@ -3,7 +3,6 @@ package com.github.tomakehurst.builderkit.json;
 import static com.github.tomakehurst.builderkit.json.Attribute.Type.OBJECT;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.emptyList;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import org.json.simple.JSONObject;
 
 import com.github.tomakehurst.builderkit.Name;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 
 public class Attribute {
 	
@@ -29,12 +29,15 @@ public class Attribute {
     	Object value = attribute.getValue();
     	if (value instanceof JSONArray) {
     		Type elementType = typeOfFirstElementIn((JSONArray) value);
-    		List<Attribute> elementAttributes = emptyList();
     		if (elementType == OBJECT) {
-    			elementAttributes = childAttributesOf(firstObjectIn((JSONArray) value));
+    			JSONObject firstObject = firstObjectIn((JSONArray) value);
+    			ObjectAttribute elementAttribute = new ObjectAttribute(
+    					new Name(name.getNonPluralForm()), firstObject.toString(), childAttributesOf(firstObject));
+    			return (T) new ArrayAttribute(name, elementType, value.toString(), elementAttribute);
     		}
-    				
-    		return (T) new ArrayAttribute(type, name, elementType, value.toString(), elementAttributes);
+    		
+    		return (T) new ArrayAttribute(name, elementType, value.toString());
+    		
     	} else if (value instanceof JSONObject) {
     		return (T) new ObjectAttribute(name, value.toString(), childAttributesOf((JSONObject) value));
     	}
@@ -91,6 +94,14 @@ public class Attribute {
 	
 	public ObjectAttribute asObjectAttribute() {
 		return (ObjectAttribute) this;
+	}
+	
+	public static Predicate<Attribute> onlyOfType(final Type type) {
+		return new Predicate<Attribute>() {
+			public boolean apply(Attribute attribute) {
+				return attribute.getType() == type;
+			}
+		};
 	}
 
 	public static enum Type { 

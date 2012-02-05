@@ -85,7 +85,7 @@ public class AttributeTest {
 		assertThat(arrayAttribute.getElementType(), is(OBJECT));
 		assertThat(arrayAttribute.getDefaultValueJson(), is("[{\"city\":\"London\"},{\"city\":\"Amsterdam\"},{\"city\":\"Paris\"}]"));
 		
-		assertThat(arrayAttribute.getElementAttributes(), hasItems(withTypeAndName(STRING, "city")));
+		assertThat(arrayAttribute.getElementAttribute(), withTypeAndName(STRING, "city"));
 	}
 	
 	@SuppressWarnings("unchecked")

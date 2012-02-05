@@ -1,6 +1,7 @@
 package com.github.tomakehurst.builderkit.json;
 
-import java.util.List;
+import static com.github.tomakehurst.builderkit.json.Attribute.Type.ARRAY;
+import static com.github.tomakehurst.builderkit.json.Attribute.Type.OBJECT;
 
 import com.github.tomakehurst.builderkit.Name;
 
@@ -8,17 +9,25 @@ public class ArrayAttribute extends Attribute {
 	
 	private final Type elementType;
 	private final String defaultValueJson;
-	private final List<Attribute> elementAttributes;
-
-	public ArrayAttribute(Type type, Name name, Type elementType, String defaultValueJson, List<Attribute> elementAttributes) {
-		super(type, name);
-		this.elementType = elementType;
-		this.defaultValueJson = defaultValueJson;
-		this.elementAttributes = elementAttributes;
+	private final ObjectAttribute elementAttribute;
+	
+	public ArrayAttribute(Name name, Type elementType, String defaultValueJson) {
+		this(name, elementType, defaultValueJson, null);
 	}
 
-	public List<Attribute> getElementAttributes() {
-		return elementAttributes;
+	public ArrayAttribute(Name name, Type elementType, String defaultValueJson, ObjectAttribute elementAttribute) {
+		super(ARRAY, name);
+		this.elementType = elementType;
+		this.defaultValueJson = defaultValueJson;
+		if (elementType != OBJECT && elementAttribute != null) {
+			throw new IllegalArgumentException("Only object arrays can have an element attribute");
+		}
+		
+		this.elementAttribute = elementAttribute;
+	}
+
+	public ObjectAttribute getElementAttribute() {
+		return elementAttribute;
 	}
 
 	public String getDefaultValueJson() {
