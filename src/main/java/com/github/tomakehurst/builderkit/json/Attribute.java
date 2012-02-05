@@ -16,6 +16,8 @@ import com.github.tomakehurst.builderkit.Name;
 import com.google.common.base.Function;
 
 public class Attribute {
+	
+	protected static final String ROOT = "$$$root$$$";
 
 	private final Type type;
     private final Name name;
@@ -34,7 +36,7 @@ public class Attribute {
     				
     		return (T) new ArrayAttribute(type, name, elementType, value.toString(), elementAttributes);
     	} else if (value instanceof JSONObject) {
-    		return (T) new ObjectAttribute(type, name, value.toString(), childAttributesOf((JSONObject) value));
+    		return (T) new ObjectAttribute(name, value.toString(), childAttributesOf((JSONObject) value));
     	}
     	
     	return (T) new Attribute(type, name);
@@ -77,6 +79,18 @@ public class Attribute {
 
 	public Name getName() {
 		return name;
+	}
+	
+	public boolean isRoot() {
+		return getName().toString().equals(ROOT);
+	}
+	
+	public ArrayAttribute asArrayAttribute() {
+		return (ArrayAttribute) this;
+	}
+	
+	public ObjectAttribute asObjectAttribute() {
+		return (ObjectAttribute) this;
 	}
 
 	public static enum Type { 
