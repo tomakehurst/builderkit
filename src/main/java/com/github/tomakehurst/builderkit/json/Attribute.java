@@ -21,6 +21,8 @@ public class Attribute {
 
 	private final Type type;
     private final Name name;
+
+    private final String defaultJson;
     
     @SuppressWarnings("unchecked")
 	public static <T extends Attribute> T fromJsonAttribute(Map.Entry<String, ?> attribute) {
@@ -42,7 +44,7 @@ public class Attribute {
     		return (T) new ObjectAttribute(name, value.toString(), childAttributesOf((JSONObject) value));
     	}
     	
-    	return (T) new Attribute(type, name);
+    	return (T) new Attribute(type, name, attribute.getValue().toString());
     }
     
     private static Type typeOfFirstElementIn(JSONArray array) {
@@ -71,9 +73,10 @@ public class Attribute {
 		return "Attribute [type=" + type + ", name=" + name + "]";
 	}
 
-	public Attribute(Type type, Name name) {
+	public Attribute(Type type, Name name, String defaultJson) {
 		this.type = type;
 		this.name = name;
+		this.defaultJson = defaultJson;
 	}
 
 	public Type getType() {
@@ -137,4 +140,8 @@ public class Attribute {
 			throw new IllegalArgumentException(javaClass.getName() + " isn't supported");
 		}
 	}
+
+    public String getDefaultJson() {
+        return defaultJson;
+    }
 }

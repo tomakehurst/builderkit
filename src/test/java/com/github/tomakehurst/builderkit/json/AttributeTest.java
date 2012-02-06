@@ -57,7 +57,7 @@ public class AttributeTest {
 		
 		ArrayAttribute arrayAttribute = (ArrayAttribute) attribute;
 		assertThat(arrayAttribute.getElementType(), is(STRING));
-		assertThat(arrayAttribute.getDefaultValueJson(), is("[\"one\",\"two\",\"three\"]"));
+		assertThat(arrayAttribute.getDefaultJson(), is("[\"one\",\"two\",\"three\"]"));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -70,7 +70,7 @@ public class AttributeTest {
 		
 		ArrayAttribute arrayAttribute = Attribute.fromJsonAttribute(jsonAttribute("numbers", jsonArray));
 		assertThat(arrayAttribute.getElementType(), is(LONG));
-		assertThat(arrayAttribute.getDefaultValueJson(), is("[5,2573,666]"));
+		assertThat(arrayAttribute.getDefaultJson(), is("[5,2573,666]"));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public class AttributeTest {
 		
 		ArrayAttribute arrayAttribute = Attribute.fromJsonAttribute(jsonAttribute("cities", jsonArray));
 		assertThat(arrayAttribute.getElementType(), is(OBJECT));
-		assertThat(arrayAttribute.getDefaultValueJson(), is("[{\"city\":\"London\"},{\"city\":\"Amsterdam\"},{\"city\":\"Paris\"}]"));
+		assertThat(arrayAttribute.getDefaultJson(), is("[{\"city\":\"London\"},{\"city\":\"Amsterdam\"},{\"city\":\"Paris\"}]"));
 		
 		assertThat(arrayAttribute.getElementAttribute(), withTypeAndName(STRING, "city"));
 	}
@@ -98,7 +98,7 @@ public class AttributeTest {
 		
 		ArrayAttribute arrayAttribute = Attribute.fromJsonAttribute(jsonAttribute("cities", jsonArray));
 		assertThat(arrayAttribute.getElementType(), is(Type.ARRAY));
-		assertThat(arrayAttribute.getDefaultValueJson(), is("[[\"1,1\",\"1,2\",\"1,3\"],[\"2,1\",\"2,2\",\"2,3\"],[\"3,1\",\"3,2\",\"3,3\"]]"));
+		assertThat(arrayAttribute.getDefaultJson(), is("[[\"1,1\",\"1,2\",\"1,3\"],[\"2,1\",\"2,2\",\"2,3\"],[\"3,1\",\"3,2\",\"3,3\"]]"));
 	}
 	
 	@Test
@@ -116,7 +116,7 @@ public class AttributeTest {
 		ObjectAttribute objAttribute = Attribute.fromJsonAttribute(jsonAttribute("size", object));
 		
 		assertThat(objAttribute.getChildAttributes(), hasItems(withTypeAndName(Type.STRING, "lengthInches")));
-		assertThat(objAttribute.getDefaultValueJson(), is("{\"lengthInches\":12}"));
+		assertThat(objAttribute.getDefaultJson(), is("{\"lengthInches\":12}"));
 	}
 	
 	@SuppressWarnings("unchecked")

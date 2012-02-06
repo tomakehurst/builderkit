@@ -8,17 +8,15 @@ import com.github.tomakehurst.builderkit.Name;
 public class ArrayAttribute extends Attribute {
 	
 	private final Type elementType;
-	private final String defaultValueJson;
 	private final ObjectAttribute elementAttribute;
 	
 	public ArrayAttribute(Name name, Type elementType, String defaultValueJson) {
 		this(name, elementType, defaultValueJson, null);
 	}
 
-	public ArrayAttribute(Name name, Type elementType, String defaultValueJson, ObjectAttribute elementAttribute) {
-		super(ARRAY, name);
+	public ArrayAttribute(Name name, Type elementType, String defaultJson, ObjectAttribute elementAttribute) {
+		super(ARRAY, name, defaultJson);
 		this.elementType = elementType;
-		this.defaultValueJson = defaultValueJson;
 		if (elementType != OBJECT && elementAttribute != null) {
 			throw new IllegalArgumentException("Only object arrays can have an element attribute");
 		}
@@ -28,10 +26,6 @@ public class ArrayAttribute extends Attribute {
 
 	public ObjectAttribute getElementAttribute() {
 		return elementAttribute;
-	}
-
-	public String getDefaultValueJson() {
-		return defaultValueJson;
 	}
 
 	public Type getElementType() {

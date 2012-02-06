@@ -9,6 +9,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
+import com.github.tomakehurst.builderkit.Name;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
@@ -16,33 +17,34 @@ public class JsonBuilderGenerator2 {
 
 	private final String packageName;
 	private final STGroup templateGroup;
-	private final String className;
-	private JsonDocumentModel model;
+	private final Name name;
+	private final JsonDocumentModel documentModel;
 
-	public JsonBuilderGenerator2(String packageName, String entityName, String sourceJson) throws ParseException {
+	public JsonBuilderGenerator2(final String packageName, final String entityName, final String sourceJson) throws ParseException {
 		this.packageName = packageName;
-		this.className = entityName + "Builder";
+		this.name = new Name(entityName);
 		templateGroup = loadStringTemplateGroup();
-		model = JsonDocumentModel.createFrom(new JSONParser().parse(sourceJson));
+		documentModel = JsonDocumentModel.createFrom(new JSONParser().parse(sourceJson));
 	}
 	
 	private STGroup loadStringTemplateGroup() {
-	    return new STGroupFile(getClass().getResource("/builder.stg"), Charsets.UTF_8.toString(), '$', '$');
+	    return new STGroupFile(getClass().getResource("/builder2.stg"), Charsets.UTF_8.toString(), '$', '$');
 	}
 
 	public String generate() {
-	    String templateName = model.isArrayRooted() ? "listRootClass" : "objectRootClass";
-		ST template = templateGroup.getInstanceOf(templateName)
+	    final BuilderClass builderClassModel = BuilderClass.fromRootAttribute(documentModel.getRootAttribute(), name.toString(), true);
+	    final String templateName = documentModel.isArrayRooted() ? "listRootClass" : "objectRootClass";
+		final ST template = templateGroup.getInstanceOf(templateName)
 			.add("package", packageName)
-			.add("model", model);
+			.add("documentModel", builderClassModel);
 		
 		return template.render();
 	}
 	
-	public void writeToFileUnder(String rootDirectory) throws IOException {
-		File packageDir = new File(rootDirectory, packageName.replace('.', '/'));
+	public void writeToFileUnder(final String rootDirectory) throws IOException {
+		final File packageDir = new File(rootDirectory, packageName.replace('.', '/'));
 		packageDir.mkdirs();
-		File javaFile = new File(packageDir, className + ".java");
+		final File javaFile = new File(packageDir, name.getBuilderClassName() + ".java");
 		Files.write(generate(), javaFile, Charsets.UTF_8);
 	}
 }

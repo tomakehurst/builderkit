@@ -21,13 +21,14 @@ public class BuilderClass {
 	private final Name name;
 	private final List<WithMethod> withMethods;
 	private final List<BuilderClass> innerBuilderClasses;
+	private final String defaultJson;
 	
 	public List<BuilderClass> getInnerBuilderClasses() {
 		return innerBuilderClasses;
 	}
 
-	public static BuilderClass fromRootAttribute(Attribute rootAttribute, String entityName) {
-		Name name = new Name(entityName);
+	public static BuilderClass fromRootAttribute(final Attribute rootAttribute, final String entityName, final boolean topLevel) {
+		final Name name = new Name(entityName);
 		
 		List<WithMethod> withMethods;
 		List<BuilderClass> innerBuilderClasses;
@@ -47,7 +48,8 @@ public class BuilderClass {
 					toWithMethod(name.getBuilderClassName())));
 			
 			if (rootAttribute.asArrayAttribute().getElementType() == OBJECT) {
-				BuilderClass innerBuilder = BuilderClass.fromRootAttribute(rootAttribute.asArrayAttribute().getElementAttribute(), "item");
+				final BuilderClass innerBuilder = BuilderClass.fromRootAttribute(
+				        rootAttribute.asArrayAttribute().getElementAttribute(), "item", false);
 				innerBuilderClasses = ImmutableList.of(innerBuilder);
 			} else {
 				innerBuilderClasses = ImmutableList.of();
@@ -57,21 +59,23 @@ public class BuilderClass {
 			throw new IllegalArgumentException("Can only create from an object or array root attribute");
 		}
 		
-		BuilderClass builderClass = new BuilderClass(name, withMethods, innerBuilderClasses, true);
+		final BuilderClass builderClass = new BuilderClass(name, withMethods, innerBuilderClasses, rootAttribute.getDefaultJson(), topLevel);
 		return builderClass;
 	}
 	
 	private static Function<Attribute, BuilderClass> toInnerBuilderClass = new Function<Attribute, BuilderClass>() {
-			public BuilderClass apply(Attribute attribute) {
-				return BuilderClass.fromRootAttribute(attribute, attribute.getName().toString());
+			public BuilderClass apply(final Attribute attribute) {
+				return BuilderClass.fromRootAttribute(attribute, attribute.getName().toString(), false);
 			}
 		};
 	
-	private BuilderClass(Name name, List<WithMethod> withMethods, List<BuilderClass> innerBuilderClasses, boolean topLevel) {
+	private BuilderClass(final Name name, final List<WithMethod> withMethods,
+	        final List<BuilderClass> innerBuilderClasses, String defaultJson, final boolean topLevel) {
 		this.topLevel = topLevel;
 		this.name = name;
 		this.withMethods = withMethods;
 		this.innerBuilderClasses = innerBuilderClasses;
+		this.defaultJson = defaultJson;
 	}
 
 	public List<WithMethod> getWithMethods() {
@@ -81,14 +85,24 @@ public class BuilderClass {
 	public Name getName() {
 		return name;
 	}
-
+	
+	public String getStaticFactoryMethodName() {
+	    return name.getIndefiniteArticleForm();
+	}
+	
+	public String getStaticFactoryReturnType() {
+	    return name.getBuilderClassName();
+	}
+	
+	
+	
 	public static class WithMethod {
 		
-		private String returnType;
-		private String name;
-		private String argumentType;
+		private final String returnType;
+		private final String name;
+		private final String argumentType;
 		
-		public WithMethod(String returnType, String name, String argumentType) {
+		public WithMethod(final String returnType, final String name, final String argumentType) {
 			this.returnType = returnType;
 			this.name = name;
 			this.argumentType = argumentType;
@@ -108,7 +122,7 @@ public class BuilderClass {
 
 		public static Function<Attribute, WithMethod> toWithMethod(final String returnType) {
 			return new Function<Attribute, WithMethod>() {
-				public WithMethod apply(Attribute attribute) {
+				public WithMethod apply(final Attribute attribute) {
 					String argumentType = attribute.getType().getJavaClassNoPackage();
 					if (attribute.getType() == OBJECT) {
 						argumentType = attribute.getName().getBuilderClassName();
@@ -118,7 +132,7 @@ public class BuilderClass {
 						argumentType = attribute.asArrayAttribute().getElementType().getJavaClassNoPackage() + "...";
 					}
 					
-					String name = attribute.isRoot() ? 
+					final String name = attribute.isRoot() ? 
 							"withItem" :
 							"with" + attribute.getName().getUpperCaseFirstLetterForm();
 					
@@ -145,6 +159,10 @@ public class BuilderClass {
 	public boolean isTopLevel() {
 		return topLevel;
 	}
+
+    public String getDefaultJson() {
+        return defaultJson;
+    }
 	
 	
 }
