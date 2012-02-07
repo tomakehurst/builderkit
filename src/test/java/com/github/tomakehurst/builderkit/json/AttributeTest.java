@@ -115,9 +115,36 @@ public class AttributeTest {
 		
 		ObjectAttribute objAttribute = Attribute.fromJsonAttribute(jsonAttribute("size", object));
 		
+		assertThat(objAttribute.isObject(), is(true));
+		assertThat(objAttribute.isArray(), is(false));
 		assertThat(objAttribute.getChildAttributes(), hasItems(withTypeAndName(Type.STRING, "lengthInches")));
 		assertThat(objAttribute.getDefaultJson(), is("{\"lengthInches\":12}"));
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void indicatesIsScalarArray() {
+	    JSONArray jsonArray = new JSONArray();
+	    jsonArray.add(5L);
+        ArrayAttribute attribute = Attribute.fromJsonAttribute(jsonAttribute("things", jsonArray));
+        assertThat(attribute.isScalarOrArrayArray(), is(true));
+        assertThat(attribute.isObjectArray(), is(false));
+	}
+	
+	@SuppressWarnings("unchecked")
+    @Test
+    public void indicatesIsObjectArray() {
+        JSONArray jsonArray = new JSONArray();
+        JSONObject obj = new JSONObject();
+        obj.put("key", "Value");
+        jsonArray.add(obj);
+        ArrayAttribute attribute = Attribute.fromJsonAttribute(jsonAttribute("things", jsonArray));
+        
+        assertThat(attribute.isArray(), is(true));
+        assertThat(attribute.isObject(), is(false));
+        assertThat(attribute.isScalarOrArrayArray(), is(false));
+        assertThat(attribute.isObjectArray(), is(true));
+    }
 	
 	@SuppressWarnings("unchecked")
 	private static JSONObject singleElementObject(String key, Object value) {

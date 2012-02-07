@@ -13,14 +13,14 @@ import com.github.tomakehurst.builderkit.Name;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
-public class JsonBuilderGenerator2 {
+public class JsonBuilderGenerator {
 
 	private final String packageName;
 	private final STGroup templateGroup;
 	private final Name name;
 	private final JsonDocumentModel documentModel;
 
-	public JsonBuilderGenerator2(final String packageName, final String entityName, final String sourceJson) throws ParseException {
+	public JsonBuilderGenerator(final String packageName, final String entityName, final String sourceJson) throws ParseException {
 		this.packageName = packageName;
 		this.name = new Name(entityName);
 		templateGroup = loadStringTemplateGroup();
@@ -28,15 +28,14 @@ public class JsonBuilderGenerator2 {
 	}
 	
 	private STGroup loadStringTemplateGroup() {
-	    return new STGroupFile(getClass().getResource("/builder2.stg"), Charsets.UTF_8.toString(), '$', '$');
+	    return new STGroupFile(getClass().getResource("/json-builder.stg"), Charsets.UTF_8.toString(), '$', '$');
 	}
 
 	public String generate() {
 	    final BuilderClass builderClassModel = BuilderClass.fromRootAttribute(documentModel.getRootAttribute(), name.toString(), true);
-	    final String templateName = documentModel.isArrayRooted() ? "listRootClass" : "objectRootClass";
-		final ST template = templateGroup.getInstanceOf(templateName)
+		final ST template = templateGroup.getInstanceOf("rootBuilderClass")
 			.add("package", packageName)
-			.add("documentModel", builderClassModel);
+			.add("model", builderClassModel);
 		
 		return template.render();
 	}

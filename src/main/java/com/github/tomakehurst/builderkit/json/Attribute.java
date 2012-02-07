@@ -1,5 +1,6 @@
 package com.github.tomakehurst.builderkit.json;
 
+import static com.github.tomakehurst.builderkit.json.Attribute.Type.ARRAY;
 import static com.github.tomakehurst.builderkit.json.Attribute.Type.OBJECT;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
@@ -91,6 +92,26 @@ public class Attribute {
 		return getName().toString().equals(ROOT);
 	}
 	
+	public boolean isObject() {
+	    return type == OBJECT;
+	}
+	
+	public boolean isArray() {
+	    return type == ARRAY;
+	}
+	
+	public boolean isObjectArray() {
+	    return (type == ARRAY && asArrayAttribute().getElementType() == OBJECT);
+	}
+	
+	public boolean isScalarOrArrayArray() {
+	    return (type == ARRAY && asArrayAttribute().getElementType() != OBJECT);
+	}
+	
+	public String getDefaultJson() {
+        return defaultJson;
+    }
+	
 	public ArrayAttribute asArrayAttribute() {
 		return (ArrayAttribute) this;
 	}
@@ -106,6 +127,14 @@ public class Attribute {
 			}
 		};
 	}
+	
+	public static Predicate<Attribute> onlyObjectArrays() {
+        return new Predicate<Attribute>() {
+            public boolean apply(Attribute attribute) {
+                return attribute.isObjectArray();
+            }
+        };
+    }
 
 	public static enum Type { 
 		STRING(String.class),
@@ -140,8 +169,4 @@ public class Attribute {
 			throw new IllegalArgumentException(javaClass.getName() + " isn't supported");
 		}
 	}
-
-    public String getDefaultJson() {
-        return defaultJson;
-    }
 }

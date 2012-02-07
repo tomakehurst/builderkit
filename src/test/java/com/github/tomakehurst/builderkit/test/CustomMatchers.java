@@ -5,8 +5,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 import com.github.tomakehurst.builderkit.json.Attribute;
-import com.github.tomakehurst.builderkit.json.BuilderClass;
-import com.github.tomakehurst.builderkit.json.BuilderClass.WithMethod;
+import com.github.tomakehurst.builderkit.json.WithMethod;
 
 public class CustomMatchers {
 
@@ -23,8 +22,8 @@ public class CustomMatchers {
 		};
 	}
 
-	public static Matcher<BuilderClass.WithMethod> named(final String name) {
-		return new TypeSafeMatcher<BuilderClass.WithMethod>() {
+	public static Matcher<WithMethod> named(final String name) {
+		return new TypeSafeMatcher<WithMethod>() {
 			public void describeTo(Description desc) {
 				desc.appendText("with method named " + name);
 				
@@ -37,8 +36,8 @@ public class CustomMatchers {
 		};
 	}
 	
-	public static Matcher<BuilderClass.WithMethod> returnType(final String returnType) {
-		return new TypeSafeMatcher<BuilderClass.WithMethod>() {
+	public static Matcher<WithMethod> returnType(final String returnType) {
+		return new TypeSafeMatcher<WithMethod>() {
 			public void describeTo(Description desc) {
 				desc.appendText("with method with return type " + returnType);
 				
@@ -51,8 +50,8 @@ public class CustomMatchers {
 		};
 	}
 	
-	public static Matcher<BuilderClass.WithMethod> argumentType(final String argumentType) {
-		return new TypeSafeMatcher<BuilderClass.WithMethod>() {
+	public static Matcher<WithMethod> argumentType(final String argumentType) {
+		return new TypeSafeMatcher<WithMethod>() {
 			public void describeTo(Description desc) {
 				desc.appendText("with argument type " + argumentType);
 				
@@ -64,4 +63,18 @@ public class CustomMatchers {
 			
 		};
 	}
+	
+	public static Matcher<WithMethod> argumentName(final String argumentName) {
+        return new TypeSafeMatcher<WithMethod>() {
+            public void describeTo(Description desc) {
+                desc.appendText("with argument name " + argumentName);
+                
+            }
+
+            public boolean matchesSafely(WithMethod withMethod) {
+                return withMethod.getArgumentName().equals(argumentName);
+            }
+            
+        };
+    }
 }

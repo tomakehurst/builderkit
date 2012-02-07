@@ -1,0 +1,131 @@
+rootBuilderClass(package, model) ::= <<
+package $package$;
+
+$imports()$
+
+$if(model.array)$
+$arrayBuilderClass(model)$
+$else$
+$objectBuilderClass(model)$
+$endif$
+>>
+
+
+arrayBuilderClass(model) ::= <<
+public class $model.name.builderClassName$ {
+	
+	private List<Object> jsonArray;
+
+	public $model.name.builderClassName$() {
+		jsonArray = parse("$model.jsonSourceStringEscaped$");
+	}
+	
+	$staticFactoryMethod(model)$
+	
+	public void add(Object obj) {
+		jsonArray.add(obj);
+	}
+	
+	public String asJson() {
+		return jsonArray.toString();
+	}
+	
+	$innerClasses(model)$
+	
+	$if(model.topLevel)$
+	$parseMethod()$
+	$endif$
+}
+>>
+
+
+objectBuilderClass(model) ::= <<
+public $if(!model.topLevel)$static $endif$class $model.name.builderClassName$ {
+	
+	private Map<String, Object> jsonObject;
+
+	public $model.name.builderClassName$() {
+		jsonObject = parse("$model.jsonSourceStringEscaped$");
+	}
+	
+	$staticFactoryMethod(model)$
+	
+	$withMethods(model)$
+	
+	public String asJson() {
+		return jsonObject.toString();
+	}
+	
+	public Map<String, Object> asJsonObject() {
+		return jsonObject;
+	}
+	
+	$innerClasses(model)$
+	
+	$if(model.topLevel)$
+	$parseMethod()$
+	$endif$
+}
+>>
+
+
+imports() ::= <<
+import java.util.*;
+import org.json.simple.*;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+>>
+
+
+innerClasses(model) ::= <<
+$model.innerBuilderClasses:{ innerModel | 
+$objectBuilderClass(innerModel)$
+}$
+>>
+
+
+withMethods(model) ::= <<
+$model.withMethods:{ method |
+$if(method.objectArray || method.scalarArray)$@SuppressWarnings("unchecked")$endif$
+public $method.returnType$ $method.name$($method.argumentType$ $method.argumentName$) {
+	$if(method.singleScalar)$
+	jsonObject.put("$method.argumentName$", $method.argumentName$);
+	$elseif(method.scalarArray)$
+	JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");
+	jsonArray.clear();
+	jsonArray.addAll(Arrays.asList($method.argumentName$));
+	$elseif(method.singleObject)$
+	jsonObject.put("$method.argumentName$", $method.argumentName$.asJsonObject());
+	$elseif(method.objectArray)$
+	JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");
+	jsonArray.clear();
+	for ($method.singlularArgumentType$ item: $method.argumentName$) {
+		jsonArray.add(item.asJsonObject());
+	\}
+	$endif$
+	return this;
+\}
+
+}$
+
+>>
+
+
+parseMethod() ::= <<
+@SuppressWarnings("unchecked")
+private static <T> T parse(String json) {
+	try {
+		return (T) new JSONParser().parse(json);
+	\} catch (ParseException e) {
+		throw new IllegalArgumentException(e);
+	\}
+\}
+>>
+
+
+
+staticFactoryMethod(model) ::= <<
+public static $model.staticFactoryReturnType$ $model.staticFactoryMethodName$() {
+	return new $model.staticFactoryReturnType$();
+\}
+>>
