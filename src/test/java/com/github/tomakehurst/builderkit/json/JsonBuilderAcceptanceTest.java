@@ -68,14 +68,8 @@ public class JsonBuilderAcceptanceTest {
 	}
 	
 	@Test
-    public void generatesListRootedBuilder() throws Exception {
-	    String json =
-	        "[                                                    \n" +
-            "   \"Thomas\",                                       \n" +
-            "   \"Matthew\",                                      \n" +
-            "   { \"key\": \"value\" },                            \n" +
-            "   15                                                 \n" +
-            "]                                                      ";
+    public void scalarListAtTopLevel() throws Exception {
+	    String json = "[ 1, 2, 3, 4 ]";
 	    
 	    JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "ListyThing", json);
         String builderJava = generator.generate();

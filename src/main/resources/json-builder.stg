@@ -90,18 +90,22 @@ $if(method.objectArray || method.scalarArray)$@SuppressWarnings("unchecked")$end
 public $method.returnType$ $method.name$($method.argumentType$ $method.argumentName$) {
 	$if(method.singleScalar)$
 	jsonObject.put("$method.argumentName$", $method.argumentName$);
+	
 	$elseif(method.scalarArray)$
 	JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");
 	jsonArray.clear();
 	jsonArray.addAll(Arrays.asList($method.argumentName$));
+	
 	$elseif(method.singleObject)$
 	jsonObject.put("$method.argumentName$", $method.argumentName$.asJsonObject());
+	
 	$elseif(method.objectArray)$
 	JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");
 	jsonArray.clear();
 	for ($method.singlularArgumentType$ item: $method.argumentName$) {
 		jsonArray.add(item.asJsonObject());
 	\}
+	
 	$endif$
 	return this;
 \}

@@ -2,7 +2,6 @@ package com.github.tomakehurst.builderkit.json;
 
 import static com.github.tomakehurst.builderkit.json.Attribute.onlyObjectArrays;
 import static com.github.tomakehurst.builderkit.json.Attribute.onlyOfType;
-import static com.github.tomakehurst.builderkit.json.Attribute.Type.ARRAY;
 import static com.github.tomakehurst.builderkit.json.Attribute.Type.OBJECT;
 import static com.github.tomakehurst.builderkit.json.WithMethod.toWithMethod;
 import static com.google.common.collect.Iterables.concat;
@@ -29,58 +28,66 @@ public class BuilderClass {
 		return innerBuilderClasses;
 	}
 
-	public static BuilderClass fromRootAttribute(final Attribute rootAttribute, final String entityName, final boolean topLevel) {
-		final Name name = new Name(entityName);
-		
-		List<WithMethod> withMethods;
-		List<BuilderClass> innerBuilderClasses;
+	public static BuilderClass fromRootAttribute(Attribute rootAttribute, String entityName, boolean topLevel) {
+		Name name = new Name(entityName);
 		
 		if (rootAttribute instanceof ObjectAttribute) {
-			withMethods = newArrayList(transform(
-					rootAttribute.asObjectAttribute().getChildAttributes(),
-					toWithMethod(name.getBuilderClassName())));
-			
-			List<Attribute> childAttributes = rootAttribute.asObjectAttribute().getChildAttributes();
-			
-			innerBuilderClasses = newArrayList(
-			        concat(
-    			        transform(
-        					filter(childAttributes, onlyOfType(OBJECT)),
-        					toInnerBuilderClass),
-    					transform(
-                            filter(childAttributes, onlyObjectArrays()),
-                            toInnerBuilderClassFromArray)));
-			
+		    return createForObject(rootAttribute, topLevel, name);
 		} else if (rootAttribute instanceof ArrayAttribute) {
-			withMethods = newArrayList(transform(
-					newArrayList(rootAttribute),
-					toWithMethod(name.getBuilderClassName())));
-			
-			if (rootAttribute.asArrayAttribute().getElementType() == OBJECT) {
-				final BuilderClass innerBuilder = BuilderClass.fromRootAttribute(
-				        rootAttribute.asArrayAttribute().getElementAttribute(), "item", false);
-				innerBuilderClasses = ImmutableList.of(innerBuilder);
-			} else {
-				innerBuilderClasses = ImmutableList.of();
-			}
-			 
+		    return createForArray(rootAttribute, topLevel, name);
 		} else {
 			throw new IllegalArgumentException("Can only create from an object or array root attribute");
 		}
-		
-		final BuilderClass builderClass = new BuilderClass(
-		        name, withMethods, innerBuilderClasses, rootAttribute.getDefaultJson(), topLevel, rootAttribute.getType() == ARRAY);
-		return builderClass;
 	}
+
+    private static BuilderClass createForArray(Attribute rootAttribute, boolean topLevel, Name name) {
+        List<WithMethod> withMethods = newArrayList(
+            transform(
+        		newArrayList(rootAttribute),
+        		toWithMethod(name.getBuilderClassName())));
+        
+        List<BuilderClass> innerBuilderClasses;
+        if (rootAttribute.asArrayAttribute().getElementType() == OBJECT) {
+        	BuilderClass innerBuilder = BuilderClass.fromRootAttribute(
+        	        rootAttribute.asArrayAttribute().getElementAttribute(), "item", false);
+        	innerBuilderClasses = ImmutableList.of(innerBuilder);
+        } else {
+        	innerBuilderClasses = ImmutableList.of();
+        }
+        
+        return new BuilderClass(name, withMethods, innerBuilderClasses, rootAttribute.getDefaultJson(),
+                topLevel, rootAttribute.isArray());
+    }
+
+    private static BuilderClass createForObject(Attribute rootAttribute, boolean topLevel, Name name) {
+        List<Attribute> childAttributes = rootAttribute.asObjectAttribute().getChildAttributes();
+        
+        List<WithMethod> withMethods = newArrayList(
+            transform(
+        		childAttributes,
+        		toWithMethod(name.getBuilderClassName())));
+        
+        List<BuilderClass> innerBuilderClasses = newArrayList(
+                concat(
+        	        transform(
+        				filter(childAttributes, onlyOfType(OBJECT)),
+        				toInnerBuilderClass),
+        			transform(
+                        filter(childAttributes, onlyObjectArrays()),
+                        toInnerBuilderClassFromArray)));
+        
+        return new BuilderClass(name, withMethods, innerBuilderClasses, rootAttribute.getDefaultJson(),
+                topLevel, rootAttribute.isArray());
+    }
 	
 	private static Function<Attribute, BuilderClass> toInnerBuilderClass = new Function<Attribute, BuilderClass>() {
-		public BuilderClass apply(final Attribute attribute) {
+		public BuilderClass apply(Attribute attribute) {
 			return BuilderClass.fromRootAttribute(attribute, attribute.getName().toString(), false);
 		}
 	};
 		
 	private static Function<Attribute, BuilderClass> toInnerBuilderClassFromArray = new Function<Attribute, BuilderClass>() {
-        public BuilderClass apply(final Attribute attribute) {
+        public BuilderClass apply(Attribute attribute) {
             Attribute arrayElementAttribute = attribute.asArrayAttribute().getElementAttribute();
             return BuilderClass.fromRootAttribute(arrayElementAttribute, attribute.getName().getNonPluralForm(), false);
         }
