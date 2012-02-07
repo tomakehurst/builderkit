@@ -22,6 +22,8 @@ public class $model.name.builderClassName$ {
 	
 	$staticFactoryMethod(model)$
 	
+	$withMethods(model)$
+	
 	public void add(Object obj) {
 		jsonArray.add(obj);
 	}
@@ -86,13 +88,13 @@ $objectBuilderClass(innerModel)$
 
 withMethods(model) ::= <<
 $model.withMethods:{ method |
-$if(method.objectArray || method.scalarArray)$@SuppressWarnings("unchecked")$endif$
+$if((method.objectArray || method.scalarArray) && !(model.topLevel && model.array))$@SuppressWarnings("unchecked")$endif$
 public $method.returnType$ $method.name$($method.argumentType$ $method.argumentName$) {
 	$if(method.singleScalar)$
 	jsonObject.put("$method.argumentName$", $method.argumentName$);
 	
 	$elseif(method.scalarArray)$
-	JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");
+	$if(!(model.topLevel && model.array))$JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");$endif$
 	jsonArray.clear();
 	jsonArray.addAll(Arrays.asList($method.argumentName$));
 	
@@ -100,7 +102,7 @@ public $method.returnType$ $method.name$($method.argumentType$ $method.argumentN
 	jsonObject.put("$method.argumentName$", $method.argumentName$.asJsonObject());
 	
 	$elseif(method.objectArray)$
-	JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");
+	$if(!(model.topLevel && model.array))$JSONArray jsonArray = (JSONArray) jsonObject.get("$method.argumentName$");$endif$
 	jsonArray.clear();
 	for ($method.singlularArgumentType$ item: $method.argumentName$) {
 		jsonArray.add(item.asJsonObject());
@@ -111,7 +113,6 @@ public $method.returnType$ $method.name$($method.argumentType$ $method.argumentN
 \}
 
 }$
-
 >>
 
 

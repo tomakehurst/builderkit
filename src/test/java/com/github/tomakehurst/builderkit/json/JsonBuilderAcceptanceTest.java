@@ -78,6 +78,24 @@ public class JsonBuilderAcceptanceTest {
 	}
 	
 	@Test
+	public void objectListAtTopLevel() throws Exception {
+	    String json =
+            "[                                                  \n" +
+            "       {                                           \n" +
+            "           \"description\": \"dull\"               \n" +
+            "       },                                          \n" +
+            "       {                                           \n" +
+            "           \"description\": \"bright\"             \n" +
+            "       }                                           \n" +
+            "]                                                  ";
+        
+        JsonBuilderGenerator generator = new JsonBuilderGenerator("com.test.something", "TopLevelListOfObjects", json);
+        String builderJava = generator.generate();
+        out.println(builderJava);
+        generator.writeToFileUnder("src/generated/java");
+	}
+	
+	@Test
 	public void generatesBuilderForMixedObjectsAndArrays() throws Exception {
 	    String json =
             "{                                                  \n" +
