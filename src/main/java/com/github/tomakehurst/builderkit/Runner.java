@@ -8,7 +8,7 @@ import java.io.File;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import com.github.tomakehurst.builderkit.json.old.JsonBuilderGenerator;
+import com.github.tomakehurst.builderkit.json.JsonBuilderGenerator;
 import com.google.common.io.Files;
 
 public class Runner {
