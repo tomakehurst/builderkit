@@ -28,8 +28,13 @@ public class Attribute {
     @SuppressWarnings("unchecked")
 	public static <T extends Attribute> T fromJsonAttribute(Map.Entry<String, ?> attribute) {
     	Name name = new Name(attribute.getKey());
-    	Type type = Type.fromClass(attribute.getValue().getClass());
+    	
     	Object value = attribute.getValue();
+    	if (value == null) {
+            return (T) new Attribute(Type.STRING, name, "");
+        } 
+    	
+    	Type type = Type.fromClass(value.getClass());
     	if (value instanceof JSONArray) {
     		Type elementType = typeOfFirstElementIn((JSONArray) value);
     		if (elementType == OBJECT) {
@@ -43,9 +48,9 @@ public class Attribute {
     		
     	} else if (value instanceof JSONObject) {
     		return (T) new ObjectAttribute(name, value.toString(), childAttributesOf((JSONObject) value));
-    	}
+    	} 
     	
-    	return (T) new Attribute(type, name, attribute.getValue().toString());
+    	return (T) new Attribute(type, name, value.toString());
     }
     
     private static Type typeOfFirstElementIn(JSONArray array) {

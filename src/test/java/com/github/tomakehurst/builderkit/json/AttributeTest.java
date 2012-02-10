@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.Test;
 
 import com.github.tomakehurst.builderkit.json.Attribute.Type;
@@ -145,6 +146,18 @@ public class AttributeTest {
         assertThat(attribute.isScalarOrArrayArray(), is(false));
         assertThat(attribute.isObjectArray(), is(true));
     }
+	
+	@SuppressWarnings("unchecked")
+    @Test
+	public void defaultsToEmptyStringWhenJsonAttributeValueNull() throws Exception {
+	    JSONObject obj = (JSONObject) new JSONParser().parse("{ \"key\": null }");
+	    Map.Entry<String, ?> firstJsonAttribute = (Map.Entry<String, ?>) obj.entrySet().iterator().next();
+	    Attribute attribute = Attribute.fromJsonAttribute(firstJsonAttribute);
+	    
+	    assertThat(attribute.getName().toString(), is("key"));
+	    assertThat(attribute.getType(), is(Type.STRING));
+	    assertThat(attribute.getDefaultJson(), is(""));
+	}
 	
 	@SuppressWarnings("unchecked")
 	private static JSONObject singleElementObject(String key, Object value) {
